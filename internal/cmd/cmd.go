@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"blog/internal/controller/admin"
+	"blog/internal/controller/article_grp"
 	"context"
 
 	"github.com/gogf/gf/v2/frame/g"
@@ -25,6 +26,7 @@ var (
 					group.Bind(
 						hello.NewV1(),
 						admin.NewV1(),
+						article_grp.NewV1(),
 					)
 				})
 			})

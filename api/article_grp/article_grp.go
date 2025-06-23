@@ -5,13 +5,10 @@
 package article_grp
 
 import (
-	"blog/api/article_grp/v1"
 	"context"
-)
 
-//type IArticleGrpApp interface {
-//	List(ctx context.Context, req *app.ListReq) (res *app.ListRes, err error)
-//}
+	"blog/api/article_grp/v1"
+)
 
 type IArticleGrpV1 interface {
 	Cre(ctx context.Context, req *v1.CreReq) (res *v1.CreRes, err error)
