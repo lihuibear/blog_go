@@ -2,6 +2,7 @@ package article_grp
 
 import (
 	"blog/internal/dao"
+	"blog/internal/logic/article"
 	"blog/internal/model"
 	"blog/internal/model/do"
 	"blog/internal/model/entity"
@@ -39,14 +40,14 @@ func Upd(ctx context.Context, id model.Id, in *model.ArticleGrpInput) (err error
 	return
 }
 
-// Del 删除文章分类（不考虑分类下的文章）
-func Del(ctx context.Context, id model.Id) (err error) {
-	_, err = dao.ArticleGrp.Ctx(ctx).Where("id", id).Delete()
+//// Del 删除文章分类（不考虑分类下的文章）
+//func Del(ctx context.Context, id model.Id) (err error) {
+//	_, err = dao.ArticleGrp.Ctx(ctx).Where("id", id).Delete()
+//
+//	return
+//}
 
-	return
-}
-
-/*// Del 删除文章分类
+// Del 删除文章分类
 func Del(ctx context.Context, id model.Id) (err error) {
 	_, err = dao.ArticleGrp.Ctx(ctx).Where("id", id).Delete()
 	// 软删除掉该分类下的文章
@@ -59,7 +60,7 @@ func Del(ctx context.Context, id model.Id) (err error) {
 		_ = article.Del(ctx, model.Id(v["id"].Uint()), false)
 	}
 	return
-}*/
+}
 
 // List 读取文章分类列表
 func List(ctx context.Context) (list []entity.ArticleGrp, err error) {

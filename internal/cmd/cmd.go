@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"blog/internal/controller/admin"
+	"blog/internal/controller/article"
 	"blog/internal/controller/article_grp"
 	"context"
 
@@ -27,6 +28,7 @@ var (
 						hello.NewV1(),
 						admin.NewV1(),
 						article_grp.NewV1(),
+						article.NewV1(),
 					)
 				})
 			})
