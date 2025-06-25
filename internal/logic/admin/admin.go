@@ -90,15 +90,33 @@ func Logout(ctx context.Context) (err error) {
 }
 
 // Info 获取当前已经登录的管理员信息
+
+// Info 根据上下文中的令牌获取管理员信息。
+// 该函数接收一个上下文参数 ctx，用于从请求头中提取令牌信息，并验证令牌。
+// 如果令牌有效且属于管理员，函数将返回管理员信息；否则，将返回一个错误。
+// 参数:
+//
+//	ctx - 上下文，用于提取请求头中的令牌信息。
+//
+// 返回值:
+//
+//	admin - 如果令牌有效且属于管理员，此参数将返回管理员信息。
+//	err - 如果发生错误（例如，令牌无效或不属于管理员），此参数将返回错误信息。
 func Info(ctx context.Context) (admin *entity.Admin, err error) {
+	// 从请求头中提取令牌信息。
 	tokenString := g.RequestFromCtx(ctx).Request.Header.Get("Authorization")
+
+	// 解析令牌并验证其合法性。
 	tokenClaims, _ := jwt.ParseWithClaims(tokenString, &AdminClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return jwtKey, nil
 	})
 
+	// 检查令牌的声明和有效性。
 	if claims, ok := tokenClaims.Claims.(*AdminClaims); ok && tokenClaims.Valid {
+		// 如果令牌有效且属于管理员，获取并返回管理员信息。
 		admin = dao.Admin.GetAdmin(claims.Username)
 	} else {
+		// 如果令牌无效或不属于管理员，返回一个错误。
 		err = utility.Err.Skip(10100)
 	}
 	return
