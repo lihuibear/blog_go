@@ -63,10 +63,24 @@ func Del(ctx context.Context, id model.Id) (err error) {
 }
 
 // List 读取文章分类列表
+// List 查询并返回所有文章组列表。
+// 该函数使用上下文 context.Context 来取消查询或处理超时情况。
+// 返回值包括：[]entity.ArticleGrp 类型的列表，包含所有查询到的文章组；
+// 和 error 类型的 err，用于返回查询过程中可能发生的错误。
 func List(ctx context.Context) (list []entity.ArticleGrp, err error) {
+	// 使用 dao.ArticleGrp.Ctx(ctx) 来执行查询，并按 'order' 字段降序排列结果。
 	res, err := dao.ArticleGrp.Ctx(ctx).Order("order desc").All()
+	if err != nil {
+		// 如果查询过程中发生错误，直接返回空列表和错误。
+		return nil, err
+	}
+
+	// 将查询结果转换为 []entity.ArticleGrp 类型的切片。
+	// 这里使用 _ = res.Structs(&list) 来忽略可能的错误，因为转换失败的情况在本函数中不作处理。
 	_ = res.Structs(&list)
-	return
+
+	// 返回查询到的文章组列表和可能的错误。
+	return list, err
 }
 
 // ListArticleCount 获取已经发布文章的文章分类列表统计

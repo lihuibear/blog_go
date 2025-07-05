@@ -13,6 +13,11 @@ import (
 	"blog/internal/controller/hello"
 )
 
+func MiddlewareCORS(r *ghttp.Request) {
+	r.Response.CORSDefault()
+	r.Middleware.Next()
+}
+
 var (
 	Main = gcmd.Command{
 		Name:  "main",
@@ -20,10 +25,11 @@ var (
 		Brief: "start http server",
 		Func: func(ctx context.Context, parser *gcmd.Parser) (err error) {
 			s := g.Server()
-			s.Group("/", func(group *ghttp.RouterGroup) {
 
+			s.Group("/", func(group *ghttp.RouterGroup) {
 				group.Middleware(ghttp.MiddlewareHandlerResponse)
 				group.Group("/v1", func(group *ghttp.RouterGroup) {
+					group.Middleware(MiddlewareCORS)
 					group.Bind(
 						hello.NewV1(),
 						admin.NewV1(),
@@ -31,8 +37,10 @@ var (
 						article.NewV1(),
 					)
 				})
+
 			})
 			s.Run()
+			s.SetPort(8080)
 			return nil
 		},
 	}
