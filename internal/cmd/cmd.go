@@ -14,33 +14,58 @@ import (
 )
 
 func MiddlewareCORS(r *ghttp.Request) {
-	r.Response.CORSDefault()
+	// 允许所有来源的跨域请求
+	r.Response.Header().Set("Access-Control-Allow-Origin", "*")
+	// 设置允许的请求方法
+	r.Response.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+	// 设置允许的请求头
+	r.Response.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	// 预检请求直接返回204
+	if r.Method == "OPTIONS" {
+		r.Response.WriteStatusExit(204)
+	}
 	r.Middleware.Next()
 }
 
+// Main 表示应用程序的入口命令。
+// 它用于初始化并启动 HTTP 服务器，并在此过程中设置必要的路由和中间件。
 var (
 	Main = gcmd.Command{
 		Name:  "main",
 		Usage: "main",
-		Brief: "start http server",
+		Brief: "启动 HTTP 服务",
 		Func: func(ctx context.Context, parser *gcmd.Parser) (err error) {
+			// 初始化服务器实例
 			s := g.Server()
 
+			// 配置根路由组
 			s.Group("/", func(group *ghttp.RouterGroup) {
+				// 添加全局中间件：HandlerResponse，用于统一处理响应格式
 				group.Middleware(ghttp.MiddlewareHandlerResponse)
+
+				// 配置 /v1 路由组
 				group.Group("/v1", func(group *ghttp.RouterGroup) {
+					// 添加跨域请求处理中间件
 					group.Middleware(MiddlewareCORS)
+
+					// 绑定控制器，注册各个业务接口
 					group.Bind(
-						hello.NewV1(),
-						admin.NewV1(),
-						article_grp.NewV1(),
-						article.NewV1(),
+						hello.NewV1(),       // Hello 模块 V1 接口
+						admin.NewV1(),       // 管理员模块 V1 接口
+						article_grp.NewV1(), // 文章分组模块 V1 接口
+						article.NewV1(),     // 文章模块 V1 接口
 					)
 				})
 
 			})
+
+			// 设置服务器监听端口
+			s.SetPort(8000)
+
+			// 启动服务器
 			s.Run()
-			s.SetPort(8080)
+
+			// 返回 nil 表示命令执行成功
 			return nil
 		},
 	}

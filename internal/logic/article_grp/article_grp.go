@@ -48,7 +48,18 @@ func Upd(ctx context.Context, id model.Id, in *model.ArticleGrpInput) (err error
 //}
 
 // Del 删除文章分类
+// Del 删除文章分类及其下的所有文章
+// 该函数首先删除指定ID的分类，然后软删除该分类下的所有文章
+// 参数:
+//
+//	ctx context.Context: 上下文对象，用于传递请求范围的信息
+//	id model.Id: 要删除的分类ID
+//
+// 返回值:
+//
+//	err error: 错误对象，如果执行过程中发生错误，则返回错误信息
 func Del(ctx context.Context, id model.Id) (err error) {
+	// 删除指定ID的分类
 	_, err = dao.ArticleGrp.Ctx(ctx).Where("id", id).Delete()
 	// 软删除掉该分类下的文章
 	data, err := dao.Article.Ctx(ctx).Fields("id").Where("grp_id", id).All()
@@ -56,6 +67,7 @@ func Del(ctx context.Context, id model.Id) (err error) {
 		return utility.Err.Sys(err)
 	}
 
+	// 遍历分类下的所有文章，并软删除它们
 	for _, v := range data {
 		_ = article.Del(ctx, model.Id(v["id"].Uint()), false)
 	}

@@ -160,12 +160,25 @@ func Show(ctx context.Context, id model.Id) (info *entity.Article, err error) {
 }
 
 // Del 删除文章
+// Del 删除文章，根据isReal参数决定是软删除还是硬删除
+// 参数:
+//
+//	ctx: 上下文，用于传递请求范围的数据
+//	id: 文章的ID
+//	isReal: 是否进行真实删除的标志，true为真实删除，false为软删除（标记为删除）
+//
+// 返回值:
+//
+//	可能发生的错误
 func Del(ctx context.Context, id model.Id, isReal bool) (err error) {
+	// 真实删除逻辑
 	if isReal {
+		// 首先尝试获取文章信息，以确定是否需要删除相关资源
 		info, err := Show(ctx, id)
 		if err != nil {
 			return err
 		}
+		// 如果文章信息存在，则进行资源删除操作
 		if info != nil {
 			// 删除文件资源
 			if len(info.Thumb) > 0 {
@@ -174,11 +187,14 @@ func Del(ctx context.Context, id model.Id, isReal bool) (err error) {
 			if len(info.Content) > 0 {
 				_ = rich.Del(ctx, &info.Content)
 			}
+			// 从数据库中真实删除文章记录
 			_, err = dao.Article.Ctx(ctx).Where("id", id).Unscoped().Delete()
 		}
 	} else {
+		// 软删除逻辑，直接在数据库中标记文章为删除状态
 		_, err = dao.Article.Ctx(ctx).Where("id", id).Delete()
 	}
+	// 返回可能发生的错误
 	return
 }
 
