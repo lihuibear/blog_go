@@ -8,6 +8,12 @@ import (
 	"blog/api/article"
 )
 
+type ControllerApp struct{}
+
+func NewApp() article.IArticleApp {
+	return &ControllerApp{}
+}
+
 type ControllerV1 struct{}
 
 func NewV1() article.IArticleV1 {

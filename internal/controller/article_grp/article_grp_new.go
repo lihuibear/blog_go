@@ -8,6 +8,12 @@ import (
 	"blog/api/article_grp"
 )
 
+type ControllerApp struct{}
+
+func NewApp() article_grp.IArticleGrpApp {
+	return &ControllerApp{}
+}
+
 type ControllerV1 struct{}
 
 func NewV1() article_grp.IArticleGrpV1 {

@@ -5,10 +5,20 @@
 package article
 
 import (
+	"blog/api/article/app"
 	"context"
 
 	"blog/api/article/v1"
 )
+
+type IArticleApp interface {
+	List(ctx context.Context, req *app.ListReq) (res *app.ListRes, err error)
+	Rank(ctx context.Context, req *app.RankReq) (res *app.RankRes, err error)
+	Show(ctx context.Context, req *app.ShowReq) (res *app.ShowRes, err error)
+	About(ctx context.Context, req *app.AboutReq) (res *app.AboutRes, err error)
+	Hist(ctx context.Context, req *app.HistReq) (res *app.HistRes, err error)
+	Reply(ctx context.Context, req *app.ReplyReq) (res *app.ReplyRes, err error)
+}
 
 type IArticleV1 interface {
 	Cre(ctx context.Context, req *v1.CreReq) (res *v1.CreRes, err error)
